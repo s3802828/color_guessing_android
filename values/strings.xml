@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Colour Kids</string>
+    <string name="button_start">START GAME</string>
+    <string name="button_setting">SETTINGS</string>
+    <string name="content_description">App Icon</string>
+    <string name="button">Button</string>
+</resources>
