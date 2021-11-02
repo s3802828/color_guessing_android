@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Colour Kids</string>
+    <string name="button_start">START GAME</string>
+    <string name="button_setting">SETTINGS</string>
+    <string name="content_description">App Icon</string>
+    <string name="button">Button</string>
+    <string name="button_previous">Previous</string>
+    <string name="button_next">Next</string>
+    <string name="button_done">DONE</string>
+    <string name="your_score">Your Score</string>
+    <string name="result_image">Result Image</string>
+    <string name="replay">REPLAY</string>
+    <string name="take_exam">TAKE EXAM</string>
+    <string name="back_to_main_menu">BACK TO MAIN MENU</string>
+    <string name="each_question_time">Each Question Time:</string>
+    <string name="customize_queried_colors">Customize Queried Colors</string>
+    <string name="save">SAVE</string>
+</resources>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingActivity">
+
+
+    <TextView
+        android:id="@+id/eachQuestionTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:layout_above="@+id/timeSeekBar"
+        android:textStyle="bold"
+        android:text="@string/each_question_time"
+        android:layout_marginEnd="5dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/eachQuestionTimeValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@+id/eachQuestionTime"
+        android:layout_above="@+id/timeSeekBar"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:text="" />
+    <SeekBar
+        android:id="@+id/timeSeekBar"
+        android:layout_width="match_parent"
+        android:layout_above="@+id/customizeColorSetting"
+        android:layout_height="62dp"
+        android:max="20"
+        android:min="1" />
+
+    <TextView
+        android:id="@+id/customizeColorSetting"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/colorPickerTable"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/customize_queried_colors" />
+
+    <TableLayout
+        android:id="@+id/colorPickerTable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+    </TableLayout>
+
+    <Button
+        android:id="@+id/buttonSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/colorPickerTable"
+        android:layout_marginVertical="50dp"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp"
+        android:layout_centerHorizontal="true"
+        android:text="@string/save" />
+
+</RelativeLayout>
