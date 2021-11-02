@@ -1,70 +1,114 @@
 package com.example.colourkids;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
 
 public class TakeExamActivity extends AppCompatActivity {
     int colorIndex = 0;
-    ColorCard chosenCard= null;
+    ColorCard chosenCard = null;
+    int totalScore = 0;
+    CountDownTimer countDownTimer;
 
+    protected String scoreToComment(double score, double total){
+        if((score/total) * 100 < 40){
+            return "fail";
+        } else if ((score/total) * 100 < 70){
+            return "good";
+        } else{
+            return "excellent";
+        }
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_take_exam);
 
-        ArrayList<ColorCard> colorCardArrayList = new ArrayList<>();
-        ColorCard colorCard1 = new ColorCard(Color.BLACK, "Black");
-        ColorCard colorCard2 = new ColorCard(Color.YELLOW, "Yellow");
-        ColorCard colorCard3 = new ColorCard(Color.GRAY, "Gray");
-        ColorCard colorCard4 = new ColorCard(Color.GREEN, "Green");
-        ColorCard colorCard5 = new ColorCard(Color.RED, "Red");
-        colorCardArrayList.add(colorCard1);
-        colorCardArrayList.add(colorCard2);
-        colorCardArrayList.add(colorCard3);
-        colorCardArrayList.add(colorCard4);
-        colorCardArrayList.add(colorCard5);
+        ArrayList<ColorCard> colorCardArrayList = ColorCardListGlobal.getColorCardArrayList();
+
+        RelativeLayout relativeLayout = findViewById(R.id.relative_layout_exam);
 
         Button buttonNext = findViewById(R.id.buttonNext);
         Button buttonPrevious = findViewById(R.id.buttonPrevious);
+        Button buttonDone = findViewById(R.id.buttonDone);
 
         chosenCard = colorCardArrayList.get(0);
 
         TextView guessColorView = findViewById(R.id.guessColor);
+        TextView timeCount = findViewById(R.id.timerExam);
 
-        RadioGroup radioGroup = findViewById(R.id.radio_group);
         ViewGroup.LayoutParams params = new RadioGroup.LayoutParams(
                 RadioGroup.LayoutParams.WRAP_CONTENT,
                 RadioGroup.LayoutParams.WRAP_CONTENT
         );
 
-        for (int i = 0; i < 3; i++) {
-            RadioButton radioButton = new RadioButton(this);
-            radioButton.setLayoutParams(params);
-            radioButton.setText("Choice " + (i+1));
-            radioGroup.addView(radioButton);
+        int[] radioGroupIds = new int[colorCardArrayList.size()];
+        RelativeLayout.LayoutParams params1 = new RelativeLayout.LayoutParams(
+                RadioGroup.LayoutParams.WRAP_CONTENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT
+        );
+        for (ColorCard card: colorCardArrayList) {
+            RadioGroup radioGroup = new RadioGroup(this);
+            relativeLayout.addView(radioGroup);
+            radioGroup.setId(View.generateViewId());
+            radioGroupIds[colorCardArrayList.indexOf(card)] = radioGroup.getId();
+            HashSet<String> choiceText = new HashSet<>();
+            choiceText.add(card.getColorName());
+            while(choiceText.size() != 4){
+                int randomInt = new Random().nextInt(colorCardArrayList.size());
+                choiceText.add(colorCardArrayList.get(randomInt).getColorName());
+            }
+            for (int i = 0; i < 4; i++) {
+                RadioButton radioButton = new RadioButton(this);
+                radioButton.setLayoutParams(params);
+                radioButton.setText(choiceText.toArray(new String[4])[i]);
+                radioGroup.addView(radioButton);
+            }
+            params1.addRule(RelativeLayout.BELOW, R.id.guessColor);
+            params1.addRule(RelativeLayout.CENTER_IN_PARENT);;
+            radioGroup.setLayoutParams(params1);
+            radioGroup.setVisibility(View.GONE);
         }
-        RadioButton radioButtonCorrect = new RadioButton(this);
-        radioButtonCorrect.setLayoutParams(params);
-        radioButtonCorrect.setText(chosenCard.getColorName());
-        radioGroup.addView(radioButtonCorrect);
+        findViewById(radioGroupIds[0]).setVisibility(View.VISIBLE);
+        Intent intent = new Intent(TakeExamActivity.this, ResultActivity.class);
+
+        countDownTimer = new CountDownTimer(75000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                timeCount.setText((millisUntilFinished / 1000) + "S");
+            }
+            public void onFinish() {
+                intent.putExtra("score", totalScore + "/" + colorCardArrayList.size());
+                intent.putExtra("comment", scoreToComment(totalScore, colorCardArrayList.size()));
+                startActivityForResult(intent, 400);
+            }
+        }.start();
 
         buttonNext.setOnClickListener(v -> {
             colorIndex++;
             if(colorIndex <= colorCardArrayList.size() - 1){
                 chosenCard = colorCardArrayList.get(colorIndex);
                 guessColorView.setBackgroundColor(chosenCard.getColorImage());
-                radioButtonCorrect.setText(chosenCard.getColorName());
+                RadioGroup radioGroup = findViewById(radioGroupIds[colorIndex-1]);
+                radioGroup.setVisibility(View.GONE);
+                RadioGroup radioGroup2 = findViewById(radioGroupIds[colorIndex]);
+                radioGroup2.setVisibility(View.VISIBLE);
             } else {
                 colorIndex = colorCardArrayList.size() - 1;
             }
@@ -75,20 +119,74 @@ public class TakeExamActivity extends AppCompatActivity {
             if(colorIndex >= 0) {
                 chosenCard = colorCardArrayList.get(colorIndex);
                 guessColorView.setBackgroundColor(chosenCard.getColorImage());
-                radioButtonCorrect.setText(chosenCard.getColorName());
+                RadioGroup radioGroup = findViewById(radioGroupIds[colorIndex+1]);
+                radioGroup.setVisibility(View.GONE);
+                RadioGroup radioGroup2 = findViewById(radioGroupIds[colorIndex]);
+                radioGroup2.setVisibility(View.VISIBLE);
             } else {
                 colorIndex = 0;
             }
         });
 
-
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == radioButtonCorrect.getId()){
-                    Toast.makeText(TakeExamActivity.this, "Correct!!!", Toast.LENGTH_SHORT).show();
-                } else Toast.makeText(TakeExamActivity.this, "No!!!", Toast.LENGTH_SHORT).show();
-            }
+        buttonDone.setOnClickListener(v -> {
+            countDownTimer.cancel();
+            intent.putExtra("score", totalScore + "/" + colorCardArrayList.size());
+            String comment = scoreToComment(totalScore, colorCardArrayList.size());
+            intent.putExtra("comment", comment);
+            startActivityForResult(intent, 400);
         });
+
+        for (int radioGroupID :radioGroupIds) {
+            RadioGroup radioGroup = findViewById(radioGroupID);
+            radioGroup. setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                boolean alreadyMinus = true;
+                boolean alreadyAdd = false;
+                @Override
+                public void onCheckedChanged(RadioGroup group, int checkedId) {
+                    RadioButton radioButton = findViewById(checkedId);
+                    if(radioButton.getText().equals(chosenCard.getColorName())){
+                        if(!alreadyAdd) {
+                            totalScore ++;
+                            alreadyAdd = true;
+                            alreadyMinus = false;
+                        }
+                    } else {
+                        if(!alreadyMinus) {
+                            totalScore--;
+                            alreadyMinus = true;
+                            alreadyAdd = false;
+                        }
+                    }
+                    }
+                }
+            );
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 400){
+            Intent intentToMain = new Intent(this, LearningActivity.class);
+            setResult(RESULT_OK, intentToMain);
+            finish();
+        }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        countDownTimer.cancel();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        countDownTimer.cancel();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        countDownTimer.cancel();
     }
 }

@@ -1,11 +1,15 @@
 package com.example.colourkids;
 
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,9 +17,8 @@ import java.util.ArrayList;
 
 
 public class LearningActivity extends AppCompatActivity {
-    boolean previousTimerActive = false;
-    int i = 0;
     int colorIndex = 0;
+    CountDownTimer countDownTimer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -23,35 +26,71 @@ public class LearningActivity extends AppCompatActivity {
 
         TextView colorImage = findViewById(R.id.colorImage);
         TextView colorName = findViewById(R.id.colorName);
+        TextView timeCount = findViewById(R.id.timerExam);
+        Button buttonReplay = findViewById(R.id.buttonReplay);
+        Button buttonTakeExam = findViewById(R.id.buttonTakeExam);
+        Intent intentResult = getIntent();
 
-        ArrayList<ColorCard> colorCardArrayList = new ArrayList<>();
-        ColorCard colorCard1 = new ColorCard(Color.BLACK, "Black");
-        ColorCard colorCard2 = new ColorCard(Color.YELLOW, "Yellow");
-        ColorCard colorCard3 = new ColorCard(Color.GRAY, "Gray");
-        ColorCard colorCard4 = new ColorCard(Color.GREEN, "Green");
-        ColorCard colorCard5 = new ColorCard(Color.RED, "Red");
-        colorCardArrayList.add(colorCard1);
-        colorCardArrayList.add(colorCard2);
-        colorCardArrayList.add(colorCard3);
-        colorCardArrayList.add(colorCard4);
-        colorCardArrayList.add(colorCard5);
-
-        CountDownTimer countDownTimer = new CountDownTimer(75000, 1000) {
+        ArrayList<ColorCard> colorCardArrayList = ColorCardListGlobal.getColorCardArrayList();
+                //intentResult.getExtras().getParcelableArrayList("colorCardList");
+        countDownTimer = new CountDownTimer(75000, 1000) {
             public void onTick(long millisUntilFinished) {
-                i++;
-                if(i % 15 == 0){
+                timeCount.setText(((millisUntilFinished / 1000) % 15) + "S");
+                if(((millisUntilFinished / 1000) + 1) % 15 == 0) {
                     colorImage.setBackgroundColor(colorCardArrayList.get(colorIndex).getColorImage());
                     colorName.setText(colorCardArrayList.get(colorIndex).getColorName());
                     colorIndex++;
                 }
-                Toast.makeText(LearningActivity.this, "seconds remaining: " + ((millisUntilFinished / 1000) % 15), Toast.LENGTH_SHORT).show();
             }
 
             public void onFinish() {
-                previousTimerActive = false;
-                Toast.makeText(LearningActivity.this, "Done!", Toast.LENGTH_SHORT).show();
+                colorImage.setVisibility(View.INVISIBLE);
+                colorName.setVisibility(View.INVISIBLE);
+                buttonReplay.setVisibility(View.VISIBLE);
+                buttonTakeExam.setVisibility(View.VISIBLE);
             }
         };
         countDownTimer.start();
+        buttonReplay.setOnClickListener(v -> {
+            buttonReplay.setVisibility(View.INVISIBLE);
+            buttonTakeExam.setVisibility(View.INVISIBLE);
+            colorImage.setVisibility(View.VISIBLE);
+            colorName.setVisibility(View.VISIBLE);
+            colorIndex = 0;
+            countDownTimer.start();
+        });
+
+        buttonTakeExam.setOnClickListener(v -> {
+            Intent intent = new Intent(LearningActivity.this, TakeExamActivity.class);
+            startActivityForResult(intent, 300);
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 300){
+            Intent intentToMain = new Intent(this, MainActivity.class);
+            setResult(RESULT_OK, intentToMain);
+            finish();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        countDownTimer.cancel();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        countDownTimer.cancel();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        countDownTimer.cancel();
     }
 }

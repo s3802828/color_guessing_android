@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/rainbow_background"
+    tools:context=".ResultActivity">
+
+    <ImageView
+        android:id="@+id/resultImage"
+        android:layout_width="256dp"
+        android:layout_height="251dp"
+        android:layout_above="@+id/comment"
+        android:layout_centerInParent="true"
+        android:contentDescription="@string/result_image"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/comment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/almendra"
+        android:text=""
+        android:textAlignment="center"
+        android:textSize="34sp" />
+
+    <TextView
+        android:id="@+id/yourScoreIs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/comment"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="50dp"
+        android:fontFamily="@font/almendra"
+        android:text="@string/your_score"
+        android:textSize="32sp" />
+
+    <TextView
+        android:id="@+id/scoreView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/yourScoreIs"
+        android:layout_centerInParent="true"
+        android:fontFamily="@font/almendra"
+        android:text=""
+        android:textSize="30sp" />
+
+    <Button
+        android:id="@+id/buttonBackToMain"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/scoreView"
+        android:layout_marginTop="30dp"
+        app:strokeColor="@color/black"
+        app:strokeWidth="1dp"
+        android:layout_centerInParent="true"
+        android:text="@string/back_to_main_menu" />
+</RelativeLayout>
